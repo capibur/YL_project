@@ -4,29 +4,16 @@ from data.user import User
 from data.track import Track
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired
 
-db_session.global_init("db/main.db")
+from forms import LoginForm, RegForm
+
+db_session.global_init("db/min.db")
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
-class RegForm(FlaskForm):
-    name = StringField('Имя', validators=[DataRequired()])
-    email = StringField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    submit = SubmitField('Зарегестрироваться')
-
-
-class LoginForm(FlaskForm):
-    email = StringField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    submit = SubmitField('Войти')
-
 
 @app.route("/reg", methods=["POST", "GET"])
-def red():
+def sing_up():
     form = RegForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -39,14 +26,14 @@ def red():
         db_sess.commit()
     elif request.method == "POST":
         if request.form["test"] == "top":
-
             print(request.form)
             return redirect("/yong")
 
     return render_template("singup_page.html", form=form)
 
+
 @app.route("/log", methods=["POST", "GET"])
-def blur():
+def sing_in():
     form = LoginForm()
     print(0)
     if form.validate_on_submit():
@@ -57,23 +44,10 @@ def blur():
             return redirect("/yong")
     return render_template("singin_page.html", form=form)
 
-@app.route("/wav")
-def streamwav():
-    def generate():
-        with open("static/song.wav", "rb") as fwav:
-            data = fwav.read(1024)
-            print(data)
-            while data:
-                yield data
-                data = fwav.read(1024)
-
-    return Response(generate(), mimetype="audio/x-wav")
-
-
-
-
 
 @app.route("/yong")
 def ter():
     return "oppps"
-app.run(debug = True)
+
+
+app.run(debug=True)

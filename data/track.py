@@ -1,9 +1,10 @@
 import datetime
 import sqlalchemy
 from .db_session import SqlAlchemyBase
+from sqlalchemy_serializer import SerializerMixin
 
 
-class Track(SqlAlchemyBase):
+class Track(SqlAlchemyBase, SerializerMixin):
     __tablename__ = "track"
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -15,4 +16,8 @@ class Track(SqlAlchemyBase):
     track_duration = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)  # в секундах
     temp_preference = sqlalchemy.Column(sqlalchemy.Float, nullable=True)
 
-    preference_mood = sqlalchemy.Column(sqlalchemy.Float, nullable=True)
+    mood_preference = sqlalchemy.Column(sqlalchemy.Float, nullable=True)
+    def __repr__(self):
+        return str(self.id)
+    def __int__(self):
+        return int(self.id)
