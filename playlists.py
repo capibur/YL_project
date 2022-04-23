@@ -33,4 +33,4 @@ def edit_playlist(db, name, user, track, edit_type=True):
     elif not edit_type:
         cur.execute(f"DELETE FROM {name}{str(user)} WHERE track={track};")
         conn.commit()
-edit_playlist("db/min.db", "liked", 2, 243534)
+

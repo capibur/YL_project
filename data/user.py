@@ -2,8 +2,9 @@ import datetime
 import sqlalchemy
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
+import flask_login
 
-class User(SqlAlchemyBase):
+class User(SqlAlchemyBase, flask_login.UserMixin):
     __tablename__ = 'users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -11,12 +12,13 @@ class User(SqlAlchemyBase):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=True)
+    town = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
-    temp_preference = sqlalchemy.Column(sqlalchemy.Float, nullable=True, default=0)
+    temp_preference = sqlalchemy.Column(sqlalchemy.Float, nullable=True, default=10)
 
-    mood_preference = sqlalchemy.Column(sqlalchemy.Float, nullable=True, default=0)
+    mood_preference = sqlalchemy.Column(sqlalchemy.Float, nullable=True, default=10)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
