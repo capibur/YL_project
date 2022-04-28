@@ -20,6 +20,7 @@ class AddTrack(FlaskForm):
     temp_preference = DecimalRangeField(label="Темп песни", places=2)
     mood_preference = DecimalRangeField(label="Настроение песни", places=2)
     track_file = FileField()
+    cover_file = FileField()
     submit = SubmitField('Загрузить')
 
 
@@ -28,3 +29,11 @@ class AddPlaylist(FlaskForm):
     playlists_description = StringField("Описание")
     playlists_cover = FileField()
     submit = SubmitField('Создать')
+
+#new
+class SearchMusic(FlaskForm):
+    search_line = StringField("Название песни", validators=[DataRequired()])
+    submit = SubmitField('Поиск')
+
+class ShowMusic(FlaskForm):
+    music = SubmitField('Поиск')

@@ -5,10 +5,11 @@ from flask_restful import reqparse, abort, Api, Resource
 from data import db_session
 from data.user import User
 from data.track import Track
+from data.playlist import Playlist
+from data.playlist_track import PlaylistTrack
 import json
 import pprint
-import sqlite3
-
+import random
 app = Flask("rec_api")
 api = Api(app)
 db_session.global_init("db/min.db")
@@ -39,7 +40,7 @@ def get_weather_coefficient(town):
 
 
 class TrackResource(Resource):
-    def get(self, user_id, town="Moscow"):
+    def get(self, user_id, town="Moscow", one_track=0):
 
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.id == user_id).first()
@@ -54,29 +55,48 @@ class TrackResource(Resource):
                                                     tp + weat_coef > User.temp_preference,
                                                     mp - weat_coef < User.mood_preference,
                                                     mp + weat_coef > User.mood_preference)]
-        conn = sqlite3.connect("db/min.db")
-        cur = conn.cursor()
         others_liked = set()
         for i in similar_users:
-            try:
-                res = cur.execute(f"""SELECT track FROM liked{i}""").fetchall()
-                for i in res:
-                    others_liked.add(int(i[0]))
-            except:
-                print("Error")
+            pl = db_sess.query(Playlist).filter(Playlist.user_id == i).first()
+            if i == 5:
+                id_pl = pl.id
+                for j in db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == id_pl):
+                    others_liked.add(j.track_id)
+
         similar_tracks = set([i.id for i in
                               db_sess.query(Track).filter(tp - weat_coef < Track.temp_preference,
                                                           tp + weat_coef > Track.temp_preference,
                                                           mp - weat_coef < Track.mood_preference,
                                                           mp + weat_coef > Track.mood_preference)])
-        rec_first_lvl = similar_tracks & others_liked
-        rec_second_lvl = similar_tracks
-        response = {
-            "rec_first_lvl": [db_sess.query(Track).get(i).to_dict() for i in rec_first_lvl],
-            "rec_second_lvl": [db_sess.query(Track).get(i).to_dict() for i in rec_second_lvl]
-        }
-        return flask.jsonify(response)
+        rec_first_lvl = list(similar_tracks & others_liked)
+        rec_second_lvl = list(similar_tracks)
+        res = rec_second_lvl + rec_first_lvl
+        if one_track == 1:
+            response = {
+                "track": db_sess.query(Track).get(random.choice(res)).to_dict()}
+        elif one_track == 1 and not rec_first_lvl and not rec_first_lvl:
+            response = {"track": random.choice([i.id for i in db_sess.query(Track).all()])}
+        else:
+            response = {
+                "rec_first_lvl": [db_sess.query(Track).get(i).to_dict() for i in rec_first_lvl],
+                "rec_second_lvl": [db_sess.query(Track).get(i).to_dict() for i in rec_second_lvl]
+            }
+
+        response_res = flask.jsonify(response)
+        response_res.headers.add('Access-Control-Allow-Origin', '*')
+        return response_res
 
 
-api.add_resource(TrackResource, "/rec_api/<int:user_id>/<string:town>")
+class PlayListTrack(Resource):
+    def get(self, playlist_id):
+        db_sess = db_session.create_session()
+        response = {"track": random.choice(
+            [i.id for i in db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id)])}
+        response_res = flask.jsonify(response)
+        response_res.headers.add('Access-Control-Allow-Origin', '*')
+        return response_res
+
+
+api.add_resource(TrackResource, "/rec_api/<int:user_id>/<string:town>/<int:one_track>")
+api.add_resource(PlayListTrack, "/pl_api/<int:playlist_id>")
 app.run()

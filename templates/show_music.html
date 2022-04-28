@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="POST" novalidate enctype="multipart/form-data">
+    <div>
+        {{ form.csrf_token }}
+    </div>
+    <h1>Поиск песни: {{ music_name }}</h1>
+    {% for name in music_list %}
+    <button type="submit" formaction="{{name}}">{{name}}</button>
+    {% endfor %}
+</form>
+</body>
+</html>

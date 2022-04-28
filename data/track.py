@@ -13,6 +13,7 @@ class Track(SqlAlchemyBase, SerializerMixin):
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
     tack_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    img_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     track_duration = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)  # в секундах
     temp_preference = sqlalchemy.Column(sqlalchemy.Float, nullable=True)
 
@@ -23,3 +24,8 @@ class Track(SqlAlchemyBase, SerializerMixin):
 
     def __int__(self):
         return int(self.id)
+    def get_id(self):
+        return str(self.id)
+
+    def get_name(self):
+        return str(self.track_name)

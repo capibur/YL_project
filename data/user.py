@@ -27,6 +27,7 @@ class User(SqlAlchemyBase, flask_login.UserMixin):
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
 
+
     def set_preference(self, liked_tp, liked_mp):
         self.temp_preference = (self.temp_preference + liked_tp) / 2
         self.mood_preference = (self.mood_preference + liked_mp) / 2

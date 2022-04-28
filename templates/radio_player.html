@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title></title>
+  <script src="{{ url_for('static',filename='js/top.js') }}"></script>
+</head>
+<body>
+<div>
+  <img src={{img_path}} width="5%" id="track_img"/>
+  <p id="name">{{name}}</p>
+</div>
+<audio id="audio" src="{{first_track }}"></audio>
+<div id="controls">
+  <div class="audio-track">
+    <div class="time"></div>
+
+  </div>
+
+  <button class="play">Play</button>
+  <button class="pause">Pause</button>
+  <button class="next">next&#62;</button>
+  <button class="like">like</button>
+  <br>
+  <select name="pl" id="s1">
+    {% for item in pl %}
+    {% if item["name"] != "liked" %}
+    <option value={{item['id']}}>{{item['name']}}</option>
+    {% endif %}
+    {% endfor %}
+  </select><br>
+  <button class="sub">sub</button>
+</div>
+
+
+</form>
+</body>
+</html>

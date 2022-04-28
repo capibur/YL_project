@@ -12,5 +12,4 @@ class Playlist(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
     img_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    all_track = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)

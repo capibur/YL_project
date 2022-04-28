@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='header.css') }}">
+     <script src="{{ url_for('static',filename='js/mu_playlists.js') }}"></script>
+</head>
+<body style="font-size: 14px; position: relative; padding: 15px 20px;">
+<header>
+<div class="menu">
+    <ul>
+        <li><a href="/homepage">Главная</a></li>
+        <li><a href="/radio">Радио</a></li>
+        <li><a href="/add/song">Добавить Трек</a></li>
+        <li><a href="/add/playlist">Добавить Плейлист</a></li>
+        <li><a href="#">Поиск</a></li>
+        <li><a href="/myplaylists">Плейлисты</a></li>
+    </ul>
+</div>
+</header>
+{% for item in pl %}
+<div>
+    <hr>
+    <h2>{{item["name"]}}</h2><br>
+    <img src="{{url_for('static', filename=item['img_path'])}}" width="8%"><br>
+    <h4>Описание:</h4>
+    <p>{{item["description"]}}</p>
+    <br>
+    <button value="{{item['id']}}" class="open">Открыть</button>
+    <br>
+    {% if item["name"] != "liked" %}
+    <button value="{{item['id']}}" class="delete">Удалить</button>
+    <br>
+    {% endif %}
+    {% endfor %}
+</div>
+</body>
+</html>
