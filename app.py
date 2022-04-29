@@ -239,7 +239,7 @@ api.add_resource(rec_api.ToPlaylist, "/pl_api/<string:choose_playlist>",
                  "/pl_api/<string:choose_playlist>/<string:track_id>")
 api.add_resource(rec_api.TrackInPlayList, "/track_pl/<int:playlist_id>", "/track_pl/<int:playlist_id>/<int:track_id>")
 api.add_resource(rec_api.TrackApi, "/track_del/<int:track_id>")
-api.add_resource(rec_api.ChangePref, "change_pref/<string:action>")
+api.add_resource(rec_api.ChangePref, "/change_pref/<string:action>")
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
