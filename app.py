@@ -191,7 +191,7 @@ def playlist(playlist_id):
     pl = db_sess.query(Playlist).filter(Playlist.id==playlist_id).first()
     tracks_id = db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id).all()
     tracks = [db_sess.query(Track).filter(Track.id == i.track_id).first() for i in tracks_id]
-    a = requests.get(f'http://0.0.0.0:5000/track_pl/{playlist_id}')
+    a = requests.get(f'https://ylp3.herokuapp.com/track_pl/{playlist_id}')
     try:
         first_track_path = a.json()["track"]["tack_path"]
     except TypeError:
