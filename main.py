@@ -201,9 +201,24 @@ def playlist(playlist_id):
     return render_template("playlist.html", tracks=tracks, playlist_id=playlist_id,
                            first_track=first_track_path,
                            img_path=pl.img_path,
-                           pl_description = pl.description,
+                           pl_description=pl.description,
                            pl_name=pl.name,
                            is_pl_my=is_pl_my)
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
+    tracks = db_sess.query(Track).filter(Track.user_id == session.get("_user_id")).all()
+    if request.method == "POST":
+        user.email = request.form.get("email")
+    db_sess.commit()
+    return render_template("profile.html", tracks=tracks,
+                           name=user.name,
+                           email=user.email
+                           )
 
 
 @app.route("/yong")
