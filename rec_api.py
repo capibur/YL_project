@@ -157,3 +157,10 @@ class ToPlaylist(Resource):
             Playlist.id == pl_id
         ).delete()
         db_sess.commit()
+class TrackApi(Resource):
+    def delete(self, track_id=0):
+        db_sess = db_session.create_session()
+        db_sess.query(Track).filter(Track.id == track_id).delete()
+        db_sess.query(PlaylistTrack).filter(PlaylistTrack.track_id == track_id
+                                            ).delete()
+        db_sess.commit()
