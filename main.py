@@ -102,7 +102,7 @@ def add_song():
         path = f"tracks/{new_track.track_name}.wav"
         cover = form.cover_file.data
         cover.save(f"static/track_cover/{form.track_name.data}.png")
-        new_track.img_path = f"static/track_cover/{form.track_name.data}.png"
+        new_track.img_path = f"track_cover/{form.track_name.data}.png"
         new_track.tack_path = path
         if data_track:
             data_track.save("static/" + path)
