@@ -120,6 +120,7 @@ class TrackInPlayList(Resource):
 class ChangePref(Resource):
     def post(self, action):
         db_sess = db_session.create_session()
+        print(session.get("_user_id"))
         user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
         track = db_sess.query(Track).filter(Track.id == session.get("_track_now")).first()
         if action == "like":
