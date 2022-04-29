@@ -61,6 +61,14 @@ btnLike.addEventListener("click", function(){
         xhr.onload = function(){
         console.log("secss")
         }
+        let xhr1 = new XMLHttpRequest();
+        xhr.open('POST', 'https://ylp3.herokuapp.com/change_pref/like');
+        xhr.responseType = 'json';
+        xhr.send();
+        xhr.onload = function(){
+        console.log("secss")
+        }
+
 
 
 })

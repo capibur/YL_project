@@ -117,6 +117,16 @@ class TrackInPlayList(Resource):
                                             ).delete()
         db_sess.commit()
 
+class ChangePref(Resource):
+    def post(self, action):
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
+        track = db_sess.query(Track).filter(Track.id == session.get("_track_now")).first()
+        if action == "like":
+            user.set_preference(track.temp_preference, user.mood_preference, "like")
+        if action == "dislike":
+            user.set_preference(track.temp_preference, user.mood_preference, "dislike")
+        db_sess.commit()
 
 class ToPlaylist(Resource):
     def post(self, choose_playlist, track_id=0):
