@@ -1,5 +1,4 @@
 
-var track_now = 0
 
   window.addEventListener("load", function() {
     let audio = document.getElementById("audio");    
@@ -12,7 +11,7 @@ var track_now = 0
     let btnSub = document.querySelector(".sub");
     let trackImg = document.getElementById("track_img");
     let trackName = document.getElementById("name");
-    function switchTreck (numTreck) {
+    function switchTreck () {
       let xhr = new XMLHttpRequest();
       xhr.open('GET', 'http://127.0.0.1:5000/rec_api/Moscow/1');
       xhr.responseType = 'json';
@@ -56,7 +55,7 @@ switchTreck();
 
 btnLike.addEventListener("click", function(){
         let xhr = new XMLHttpRequest();
-        xhr.open('GET', 'http://127.0.0.1:5000/pl_api/liked');
+        xhr.open('POST', 'http://127.0.0.1:5000/pl_api/liked');
         xhr.responseType = 'json';
         xhr.send();
         xhr.onload = function(){
