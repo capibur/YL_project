@@ -11,7 +11,7 @@ window.addEventListener("load", function() {
 
      function switchTreck () {
       let xhr = new XMLHttpRequest();
-      xhr.open('GET', 'http://127.0.0.1:5000/track_pl/' + btnPlay.value);
+      xhr.open('GET', 'http://0.0.0.0:5000/track_pl/' + btnPlay.value);
       xhr.responseType = 'json';
       xhr.send();
       xhr.onload = function() {
@@ -43,7 +43,7 @@ window.addEventListener("load", function() {
 for (let i = 0; i < btnDelete.length; i++) {
   btnDelete[i].addEventListener("click", function(){
         let xhr = new XMLHttpRequest();
-        xhr.open('DELETE', 'http://127.0.0.1:5000/track_pl/' + btnPlay.value +"/"+ btnDelete[i].value );
+        xhr.open('DELETE', 'http://0.0.0.0:5000/track_pl/' + btnPlay.value +"/"+ btnDelete[i].value );
         xhr.responseType = 'json';
         xhr.send();
         xhr.onload = function(){

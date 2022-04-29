@@ -136,7 +136,7 @@ def add_playlist():
 @login_required
 def radio():
     db_sess = db_session.create_session()
-    a = requests.get(f'http://127.0.0.1:5000/rec_api/Moscow/1/{session.get("_user_id")}')
+    a = requests.get(f'http://0.0.0.0:5000/rec_api/Moscow/1/{session.get("_user_id")}')
     first_track_path = a.json()["track"]["tack_path"]
     session["_track_now"] = first_track_path
     playlists = [i for i in db_sess.query(Playlist).filter(Playlist.user_id == session.get("_user_id"))]
@@ -191,7 +191,7 @@ def playlist(playlist_id):
     pl = db_sess.query(Playlist).filter(Playlist.id==playlist_id).first()
     tracks_id = db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id).all()
     tracks = [db_sess.query(Track).filter(Track.id == i.track_id).first() for i in tracks_id]
-    a = requests.get(f'http://127.0.0.1:5000/track_pl/{playlist_id}')
+    a = requests.get(f'http://0.0.0.0:5000/track_pl/{playlist_id}')
     try:
         first_track_path = a.json()["track"]["tack_path"]
     except TypeError:
