@@ -56,7 +56,9 @@ def sing_up():
         user = User()
         user.name = form.name.data
         user.town = form.town.data
+        print(form.email.data)
         user.email = form.email.data
+
         user.hashed_password = user.set_password(form.password.data)
         db_sess.add(user)
 
@@ -153,7 +155,10 @@ def home_page():
     user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
     tracks = db_sess.query(Track).all()
     pl = [i for i in db_sess.query(Playlist).filter(Playlist.user_id == session.get("_user_id"))]
-    track_list = [random.choice(tracks) for i in range(10)]
+    if pl:
+        track_list = [random.choice(tracks) for i in range(10)]
+    else:
+        tracks_list = []
     return render_template("home_page.html", user_name=user.name, tracks=track_list, pl=pl)
 
 
