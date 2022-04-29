@@ -13,7 +13,7 @@
     let trackName = document.getElementById("name");
     function switchTreck () {
       let xhr = new XMLHttpRequest();
-      xhr.open('GET', 'http://0.0.0.0:5000/rec_api/Moscow/1');
+      xhr.open('GET', 'https://ylp3.herokuapp.com/rec_api/Moscow/1');
       xhr.responseType = 'json';
       xhr.send();
       xhr.onload = function() {
@@ -55,7 +55,7 @@ switchTreck();
 
 btnLike.addEventListener("click", function(){
         let xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://0.0.0.0:5000/pl_api/liked');
+        xhr.open('POST', 'https://ylp3.herokuapp.com/pl_api/liked');
         xhr.responseType = 'json';
         xhr.send();
         xhr.onload = function(){
@@ -68,7 +68,7 @@ btnLike.addEventListener("click", function(){
 btnSub.addEventListener("click", function(){
         console.log(playlist.value)
                 let xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://0.0.0.0:5000/pl_api/' + playlist.value);
+        xhr.open('POST', 'https://ylp3.herokuapp.com/pl_api/' + playlist.value);
         xhr.responseType = 'json';
         xhr.send();
         xhr.onload = function(){
