@@ -136,7 +136,7 @@ def add_playlist():
 @login_required
 def radio():
     db_sess = db_session.create_session()
-    a = requests.get(f'http://0.0.0.0:5000/rec_api/Moscow/1/{session.get("_user_id")}')
+    a = requests.get(f'https://ylp3.herokuapp.com/rec_api/Moscow/1/{session.get("_user_id")}')
     first_track_path = a.json()["track"]["tack_path"]
     session["_track_now"] = first_track_path
     playlists = [i for i in db_sess.query(Playlist).filter(Playlist.user_id == session.get("_user_id"))]
