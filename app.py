@@ -14,7 +14,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user
 
 from forms import LoginForm, RegForm, AddTrack, AddPlaylist, SearchMusic, ShowMusic
 
-URL = "0.0.0.0:5000"
+URL = "ylp3.herokuapp.com"
 db_session.global_init("db/min.db")
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
