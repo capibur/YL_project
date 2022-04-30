@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Привет, Яндекс!</title>
+    <title>Регистрация</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='index.css') }}">
 
 </head>
 <body>
+<img src="{{ url_for('static',filename='icons/icon_m.svg') }}">Wolves Exist</img>
 <h3>Авторизация</h3>
 <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}

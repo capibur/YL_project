@@ -10,6 +10,7 @@ from data.playlist_track import PlaylistTrack
 import json
 import pprint
 import random
+
 app = Flask("rec_api")
 api = Api(app)
 db_session.global_init("db/min.db")
@@ -95,11 +96,12 @@ class TrackResource(Resource):
 class TrackInPlayList(Resource):
     def get(self, playlist_id, track_id=0):
         db_sess = db_session.create_session()
-        print(self)
-        try:
 
+        try:
+            print(db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id).first())
             track_id = random.choice(
-                [i.track_id for i in db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id)])
+                [i.track_id for i in
+                 db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id).all()])
         except IndexError:
             return 8
 
@@ -117,32 +119,31 @@ class TrackInPlayList(Resource):
                                             ).delete()
         db_sess.commit()
 
-class ChangePref(Resource):
-    def post(self, action):
-        db_sess = db_session.create_session()
-        print(session.get("_user_id"))
-        user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
-        track = db_sess.query(Track).filter(Track.id == session.get("_track_now")).first()
-        if action == "like":
-            user.set_preference(track.temp_preference, user.mood_preference, "like")
-        if action == "dislike":
-            user.set_preference(track.temp_preference, user.mood_preference, "dislike")
-        db_sess.commit()
 
 class ToPlaylist(Resource):
     def post(self, choose_playlist, track_id=0):
         db_sess = db_session.create_session()
-        if choose_playlist == "liked":
-            choose_playlist = db_sess.query(Playlist).filter(Playlist.name == "liked",
-                                                             Playlist.user_id == session.get("_user_id")
-                                                             ).first().id
         if track_id:
             track = db_sess.query(Track).filter(Track.id == track_id).first()
         else:
             track = db_sess.query(Track).filter(Track.tack_path == session.get("_track_now")).first()
+        if choose_playlist == "liked":
+            choose_playlist = db_sess.query(Playlist).filter(Playlist.name == "liked",
+                                                             Playlist.user_id == session.get("_user_id")
+                                                             ).first().id
+            user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
+            user.set_preference(track.temp_preference, track.mood_preference, "like")
+        elif choose_playlist == "disliked":
+            choose_playlist = db_sess.query(Playlist).filter(Playlist.name == "disliked",
+                                                             Playlist.user_id == session.get("_user_id")
+                                                             ).first().id
+            user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
+            track = db_sess.query(Track).filter(Track.tack_path == session.get("_track_now")).first()
+            user.set_preference(track.temp_preference, track.mood_preference, "dislike")
+        else:
+            track = db_sess.query(Track).filter(Track.tack_path == session.get("_track_now")).first()
         track_playlist = PlaylistTrack()
         track_playlist.track_id = track.id
-        print(choose_playlist)
         playlist = db_sess.query(Playlist).filter(Playlist.id == choose_playlist).first()
         if playlist:
             track_playlist.playlist_id = playlist.id
@@ -155,6 +156,7 @@ class ToPlaylist(Resource):
                                                    PlaylistTrack.playlist_id == track_playlist.playlist_id).first():
             db_sess.add(track_playlist)
         db_sess.commit()
+        print("88005553535")
         return response_res
 
     def delete(self, choose_playlist, track_id=0):
@@ -168,6 +170,8 @@ class ToPlaylist(Resource):
             Playlist.id == pl_id
         ).delete()
         db_sess.commit()
+
+
 class TrackApi(Resource):
     def delete(self, track_id=0):
         db_sess = db_session.create_session()

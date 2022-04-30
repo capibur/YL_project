@@ -14,6 +14,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user
 
 from forms import LoginForm, RegForm, AddTrack, AddPlaylist, SearchMusic, ShowMusic
 
+URL = "0.0.0.0:5000"
 db_session.global_init("db/min.db")
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -25,14 +26,7 @@ api = Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('user_id', required=True, type=int)
 
-
-
-
-
-
-def check_path(path):
-    if os.path.exists(path):
-        path
+print("я жив")
 
 
 @login_manager.user_loader
@@ -40,12 +34,17 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
+@app.route("/")
+def main_p():
+    return render_template("main.html")
 
-@app.route('/logout')
+@app.route('/logout', methods=["POST", "GET"])
 @login_required
 def logout():
-    logout_user()
-    return redirect("/")
+    if request.method == 'POST':
+        logout_user()
+        return redirect("/log")
+    return render_template("logout.html")
 
 
 @app.route("/reg", methods=["POST", "GET"])
@@ -66,9 +65,15 @@ def sing_up():
         l_playlist = Playlist()
         l_playlist.name = "liked"
         l_playlist.description = "лайкнутные треки"
-        l_playlist.img_path = "liked.png"
+        l_playlist.img_path = "playlist_cover/like.svg"
         l_playlist.user_id = user.id
+        dl_playlist = Playlist()
+        dl_playlist.name = "disliked"
+        dl_playlist.description = "ОТРОДЬЕ САТАНЫ"
+        dl_playlist.img_path = "playlist_cover/dislike.svg"
+        dl_playlist.user_id = user.id
         db_sess.add(l_playlist)
+        db_sess.add(dl_playlist)
         db_sess.commit()
 
         login_user(user, remember=True)
@@ -84,7 +89,7 @@ def sing_in():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=True)
-
+            return redirect("/homepage")
     return render_template("singin_page.html", form=form)
 
 
@@ -110,6 +115,7 @@ def add_song():
             data_track.save("static/" + path)
             db_sess.add(new_track)
             db_sess.commit()
+            return redirect("/homepage")
     return render_template("add_track.html", form=form)
 
 
@@ -126,19 +132,22 @@ def add_playlist():
         new_playlist.name = form.playlists_name.data
         new_playlist.description = form.playlists_description.data
         cover = form.playlists_cover.data
-        cover.save(f"static/playlist_cover/{new_playlist.id}.png")
+        cover.save(f"static/playlist_cover/{form.playlists_name.data}.png")
         new_playlist.user_id = session.get("_user_id")
-        new_playlist.img_path = f"playlist_cover/{new_playlist.id}.png"
+        new_playlist.img_path = f"playlist_cover/{form.playlists_name.data}.png"
+        print(form.playlists_name.data)
         db_sess.add(new_playlist)
         db_sess.commit()
+        return redirect("/homepage")
     return render_template("add_playlist.html", form=form)
 
 
 @app.route("/radio", methods=["POST", "GET"])
 @login_required
 def radio():
+    print(23)
     db_sess = db_session.create_session()
-    a = requests.get(f'https://ylp3.herokuapp.com/rec_api/Moscow/1/{session.get("_user_id")}')
+    a = requests.get(f'http://{URL}/rec_api/Moscow/1/{session.get("_user_id")}')
     first_track_path = a.json()["track"]["tack_path"]
     session["_track_now"] = first_track_path
     playlists = [i for i in db_sess.query(Playlist).filter(Playlist.user_id == session.get("_user_id"))]
@@ -155,6 +164,7 @@ def home_page():
     user = db_sess.query(User).filter(User.id == session.get("_user_id")).first()
     tracks = db_sess.query(Track).all()
     pl = [i for i in db_sess.query(Playlist).filter(Playlist.user_id == session.get("_user_id"))]
+    print(pl)
     if pl:
         track_list = [random.choice(tracks) for i in range(10)]
     else:
@@ -171,17 +181,21 @@ def my_playlists():
 
     return render_template("my_playlists.html", pl=pl)
 
+
 @app.route("/show_music", methods=["GET", "POST"])
+@login_required
 def show_music(name):
     form = ShowMusic()
     db_sess = db_session.create_session()
-    music = db_sess.query(Track).filter(Track.track_name.like(f"%{name}%"))
-    music_list = [i.get_name() for i in music]
+    music = db_sess.query(Track).filter(Track.track_name.like(f"%{name}%")).all()
 
-    return render_template("show_music.html", form=form, music_name=name, music_list=music_list)
+    pl = [i for i in db_sess.query(Playlist).filter(Playlist.user_id == session.get("_user_id"))]
+    print([2, 2, 2, 2, 2, 22], 8798778)
+    return render_template("show_music.html", form=form, music_name=name, music=music, pl=pl)
 
 
-@app.route("/search_music", methods=["GET", "POST"])
+@app.route("/search", methods=["GET", "POST"])
+@login_required
 def search_music():
     form = SearchMusic()
     if form.validate_on_submit():
@@ -193,12 +207,14 @@ def search_music():
 @app.route("/playlist/<int:playlist_id>")
 def playlist(playlist_id):
     db_sess = db_session.create_session()
-    pl = db_sess.query(Playlist).filter(Playlist.id==playlist_id).first()
+    pl = db_sess.query(Playlist).filter(Playlist.id == playlist_id).first()
     tracks_id = db_sess.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id).all()
     tracks = [db_sess.query(Track).filter(Track.id == i.track_id).first() for i in tracks_id]
-    a = requests.get(f'https://ylp3.herokuapp.com/track_pl/{playlist_id}')
+    a = requests.get(f'http://{URL}/track_pl/{playlist_id}')
+    print(playlist_id)
     try:
         first_track_path = a.json()["track"]["tack_path"]
+
     except TypeError:
         first_track_path = "/none"
     print(pl.user_id, session.get("_user_id"))
@@ -230,6 +246,7 @@ def profile():
 
 @app.route("/yong")
 def ter():
+    print(22222222)
     return "oppps"
 
 
@@ -239,7 +256,6 @@ api.add_resource(rec_api.ToPlaylist, "/pl_api/<string:choose_playlist>",
                  "/pl_api/<string:choose_playlist>/<string:track_id>")
 api.add_resource(rec_api.TrackInPlayList, "/track_pl/<int:playlist_id>", "/track_pl/<int:playlist_id>/<int:track_id>")
 api.add_resource(rec_api.TrackApi, "/track_del/<int:track_id>")
-api.add_resource(rec_api.ChangePref, "/change_pref/<string:action>")
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
